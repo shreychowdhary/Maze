@@ -55,11 +55,20 @@ var Graph = function(maxArc){
         }
     }
     this.exitCell = this.cells[17][0];
+    this.exitCell.neighbors[3] = 0;
 }
 
-circleGraph = new Graph(10);
-
-function generateMaze(curCell,lastCell){
+circleGraph = new Graph(5);
+cellPath = [circleGraph.startCell];
+solvePath = [];
+function generateMaze(curCell){
+    if(curCell == circleGraph.startCell){
+        console.log("done");
+        return;
+    }
+    if(curCell == circleGraph.exitCell){
+        solvePath = cellPath.slice();
+    }
     curCell.visited = true;
     x = curCell.x;
     y = curCell.y;
@@ -85,6 +94,7 @@ function generateMaze(curCell,lastCell){
             nearBy.push(circleGraph.cells[y+1][x]);
         }
     }
+
     visitable = [];
     for(i = 0; i < nearBy.length; i++){
         if(!nearBy[i].visited){
@@ -92,18 +102,23 @@ function generateMaze(curCell,lastCell){
         }
     }
 
-    if(visitable.length == 0){
-        return;
-    }
+    lastCell = cellPath[cellPath.length-1];
+    if(visitable.length > 0 && curCell != circleGraph.exitCell){
 
-    nextCell = visitable[Math.floor(Math.random() * visitable.length)];
-    curCell.neighbors[nearBy.indexOf(nextCell)] = nextCell;
-    curCell.neighbors[nearBy.indexOf(lastCell)] = lastCell;
-    console.log(curCell.neighbors);
-    generateMaze(nextCell,curCell);
+        nextCell = visitable[Math.floor(Math.random() * visitable.length)];
+        curCell.neighbors[nearBy.indexOf(nextCell)] = nextCell;
+        curCell.neighbors[nearBy.indexOf(lastCell)] = lastCell;
+        cellPath.push(curCell);
+        generateMaze(nextCell);
+    }
+    else{
+        cellPath.pop();
+        curCell.neighbors[nearBy.indexOf(lastCell)] = lastCell;
+        generateMaze(lastCell);
+    }
 }
 generateMaze(circleGraph.cells[1][0],circleGraph.startCell);
-
+console.log(solvePath);
 
 //create cells based on width
 //based on cell number you can draw lines around it
@@ -117,46 +132,63 @@ function drawGrid(){
     context.arc(radius,radius,radius*.01,0,2*Math.PI);
     context.stroke();
     context.fill();
+    //draw start circle
     for(i = 1; i < 4; i++){
         context.beginPath();
         context.arc(radius,radius,radius*.05,i*Math.PI/2,(i+1)*Math.PI/2);
         context.stroke();
     }
+
+    for(y = 1; y < circleGraph.cells.length; y++){
+        for(x = 0; x < circleGraph.cells[y].length; x++){
+            /*if(solvePath.includes(circleGraph.cells[y][x])){
+                 context.strokeStyle = '#ff0000';
+            }
+            else{
+                 context.strokeStyle = '#000000';
+            }*/
+            curDegrees = circleGraph.cells[y][x].degrees;
+            neighbors = circleGraph.cells[y][x].neighbors;
+            //outer arc
+            //left and right
+            if(circleGraph.cells[y][x].neighbors.length == 5){
+                //topleft
+                if(neighbors[4] == null){
+                    context.beginPath();
+                    context.arc(radius,radius,radius*(y+1)/20,(curDegrees*x)/180*Math.PI,(curDegrees*x)/180*Math.PI+(curDegrees)/360*Math.PI);
+                    context.stroke();
+                }
+                //topright
+                if(neighbors[3] == null){
+                    context.beginPath();
+                    context.arc(radius,radius,radius*(y+1)/20,(curDegrees*x)/180*Math.PI+(curDegrees)/360*Math.PI,(curDegrees*(x+1))/180*Math.PI);
+                    context.stroke();
+                }
+            }
+            else{
+                if(neighbors[3] == null){
+                    context.beginPath();
+                    context.arc(radius,radius,radius*(y+1)/20,(curDegrees*x)/180*Math.PI,(curDegrees*(x+1))/180*Math.PI);
+                    context.stroke();
+                }
+            }
+            if(neighbors[0] == null){
+                context.beginPath();
+                context.moveTo(radius*(y/20)*Math.cos(curDegrees*x/180*Math.PI) + radius,radius*(y/20)*Math.sin(curDegrees*x/180*Math.PI) + radius);
+                context.lineTo(radius*((y+1)/20)*Math.cos(curDegrees*x/180*Math.PI) + radius,radius*((y+1)/20)*Math.sin(curDegrees*x/180*Math.PI) + radius);
+                context.stroke();
+            }
+            if(neighbors[2] == null){
+                context.beginPath();
+                context.moveTo(radius*(y/20)*Math.cos(curDegrees*(x+1)/180*Math.PI) + radius,radius*(y/20)*Math.sin(curDegrees*(x+1)/180*Math.PI) + radius);
+                context.lineTo(radius*((y+1)/20)*Math.cos(curDegrees*(x+1)/180*Math.PI) + radius,radius*((y+1)/20)*Math.sin(curDegrees*(x+1)/180*Math.PI) + radius);
+                context.stroke();
+            }
+        }
+    }
 }
 
 drawGrid();
-
-function drawCircle(){
-    if(canvas.getContext){
-		var context = canvas.getContext("2d");
-        context.lineWidth = 5;
-        context.lineCap = "round";
-        for(i = .9; i > 0; i -= .05){
-            context.beginPath();
-
-            context.arc(radius,radius,radius*i,0,2*Math.PI);
-            context.stroke();
-        }
-
-        context.beginPath();
-        for(i = 1; i <= 18; i += 2){
-            context.moveTo(radius + radius * i/20,radius);
-            context.lineTo(radius * (i+1)/20 + radius,radius);
-        }
-
-		/*for(i = 0; i < Math.PI * 2 - .0001; i += degrees / 180 * Math.PI) {
-			context.moveTo(Math.cos(i) * radius * .05 + radius, Math.sin(i) * radius * .05 + radius);
-			context.lineTo(Math.cos(i) * radius * .95 + radius, Math.sin(i) * radius * .95 + radius);
-		}*/
-		context.stroke();
-
-        context.beginPath();
-        radius = Math.floor(canvas.width/2);
-        context.arc(radius,radius,radius*.01,0,2*Math.PI);
-        context.stroke();
-        context.fill();
-    }
-}
 
 
 function mod(n, m) {
