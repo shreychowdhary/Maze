@@ -1,16 +1,14 @@
 var canvas = document.getElementById("myCanvas");
 
 if(window.outerWidth > window.outerHeight){
-    canvas.width = window.outerHeight * .5;
-    canvas.height = window.outerHeight * .5;
+    canvas.width = window.outerHeight * .9;
+    canvas.height = window.outerHeight * .9;
 }
 else{
-    canvas.width = window.outerWidth * .5;
-    canvas.height = window.outerWidth * .5;
+    canvas.width = window.outerWidth * .9;
+    canvas.height = window.outerWidth * .9;
 }
 
-canvas.width = 400;
-canvas.height = 400;
 
 radius = Math.floor(canvas.width/2);
 
@@ -29,7 +27,7 @@ var Graph = function(maxArc){
     this.cells = [];
     this.cells.length = 18;
 
-    degrees = 90;
+    degrees = 45;
     this.cells[0] = [];
     this.cells[0][0] = this.startCell;
     for(y = 1; y < 18; y++){
@@ -61,7 +59,7 @@ var Graph = function(maxArc){
     this.exitCell.neighbors[3] = 0;
 }
 
-circleGraph = new Graph(10);
+circleGraph = new Graph(4);
 cellPath = [circleGraph.startCell];
 solvePath = [];
 
@@ -206,31 +204,50 @@ tImgData.data[1] = 255;
 tImgData.data[2] = 255;
 tImgData.data[3] = 255;
 context.putImageData(tImgData,x,y);
+canvasData = [];
+canvasData.length = canvas.width;
+for(i = 0; i < canvas.width; i++){
+    canvasData[i] = [];
+    canvasData[i].length = canvas.height;
+}
+
+canvasRawData = context.getImageData(0,0,canvas.width,canvas.height);
+for(i = 0; i < canvasRawData.data.length; i+=4) {
+    canvasData[(i/4) % (canvas.width)][Math.floor(i/(canvas.height*4))] = [canvasRawData.data[i],
+    canvasRawData.data[i+1],
+    canvasRawData.data[i+2],
+    canvasRawData.data[i+3]];
+    //console.log(i % (canvas.width*4) + " " + Math.floor(i/(canvas.height*4)));
+}
 FloodFill();
 function FloodFill(){
     pixel = Queue.shift();
-    eImgData = context.getImageData(pixel[0]-1,pixel[1],1,1);
-    if((pixel[0] > .1*radius && eImgData.data[0] == 255 && eImgData.data[1] == 255 && eImgData.data[2] == 255) || (wImgData.data[3] > 0 && wImgData.data[3] < 200)){
+    eImgData = canvasData[pixel[0]-1][pixel[1]];
+    if((eImgData[0] === 255 && eImgData[1] === 255 && eImgData[2] === 255) || (eImgData[3] > 0 && eImgData[3] < 200)){
+        canvasData[pixel[0]-1][pixel[1]] = tImgData.data;
         context.putImageData(tImgData,pixel[0]-1,pixel[1]);
         Queue.push([pixel[0]-1,pixel[1]]);
     }
-    wImgData = context.getImageData(pixel[0]+1,pixel[1],1,1);
-    if((pixel[0] < 1.9*radius && wImgData.data[0] == 255 && wImgData.data[1] == 255 && wImgData.data[2] == 255) || (wImgData.data[3] > 0 && wImgData.data[3] < 200)){
+    wImgData = canvasData[pixel[0]+1][pixel[1]];
+    if((wImgData[0] === 255 && wImgData[1] === 255 && wImgData[2] === 255) || (wImgData[3] > 0 && wImgData[3] < 200)){
+        canvasData[pixel[0]+1][pixel[1]] = tImgData.data;
         context.putImageData(tImgData,pixel[0]+1,pixel[1]);
         Queue.push([pixel[0]+1,pixel[1]]);
     }
-    nImgData = context.getImageData(pixel[0],pixel[1]-1,1,1);
-    if((pixel[1] > .1*radius && nImgData.data[0] == 255 && nImgData.data[1] == 255 && nImgData.data[2] == 255) || (wImgData.data[3] > 0 && wImgData.data[3] < 200)){
+    nImgData = canvasData[pixel[0]][pixel[1]-1];
+    if((pixel[1] > .1*radius && nImgData[0] === 255 && nImgData[1] === 255 && nImgData[2] === 255) || (nImgData[3] > 0 && nImgData[3] < 200)){
+        canvasData[pixel[0]][pixel[1]-1] = tImgData.data;
         context.putImageData(tImgData,pixel[0],pixel[1]-1);
         Queue.push([pixel[0],pixel[1]-1]);
     }
-    sImgData = context.getImageData(pixel[0],pixel[1]+1,1,1);
-    if((pixel[1] < 1.9*radius && sImgData.data[0] == 255 && sImgData.data[1] == 255 && sImgData.data[2] == 255) || (sImgData.data[3] > 0 && wImgData.data[3] < 200)){
+    sImgData = canvasData[pixel[0]][pixel[1]+1];
+    if((sImgData[0] === 255 && sImgData[1] === 255 && sImgData[2] === 255) || (sImgData[3] > 0 && sImgData[3] < 200)){
+        canvasData[pixel[0]][pixel[1]+1] = tImgData.data;
         context.putImageData(tImgData,pixel[0],pixel[1]+1);
         Queue.push([pixel[0],pixel[1]+1]);
     }
     if(Queue.length > 0){
-        setTimeout(FloodFill,1);
+        setTimeout(FloodFill,0);
     }
 }
 
