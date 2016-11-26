@@ -1,13 +1,16 @@
 var canvas = document.getElementById("myCanvas");
 
 if(window.outerWidth > window.outerHeight){
-    canvas.width = window.outerHeight * .9;
-    canvas.height = window.outerHeight * .9;
+    canvas.width = window.outerHeight * .5;
+    canvas.height = window.outerHeight * .5;
 }
 else{
-    canvas.width = window.outerWidth * .9;
-    canvas.height = window.outerWidth * .9;
+    canvas.width = window.outerWidth * .5;
+    canvas.height = window.outerWidth * .5;
 }
+
+canvas.width = 400;
+canvas.height = 400;
 
 radius = Math.floor(canvas.width/2);
 
@@ -58,9 +61,10 @@ var Graph = function(maxArc){
     this.exitCell.neighbors[3] = 0;
 }
 
-circleGraph = new Graph(5);
+circleGraph = new Graph(10);
 cellPath = [circleGraph.startCell];
 solvePath = [];
+
 function generateMaze(curCell){
     if(curCell == circleGraph.startCell){
         console.log("done");
@@ -118,16 +122,20 @@ function generateMaze(curCell){
     }
 }
 generateMaze(circleGraph.cells[1][0],circleGraph.startCell);
-console.log(solvePath);
 
 //create cells based on width
 //based on cell number you can draw lines around it
 //
 function drawGrid(){
     context = canvas.getContext("2d");
-    context.lineWidth = 5;
+    context.lineWidth = 4;
     context.lineCap = "round";
-
+    context.strokeStyle="white";
+    context.fillStyle="white";
+    context.arc(radius, radius, radius*.9, 0, 2 * Math.PI);
+    context.fill();
+    context.strokeStyle="black";
+    context.fillStyle="black";
     context.beginPath();
     context.arc(radius,radius,radius*.01,0,2*Math.PI);
     context.stroke();
@@ -189,6 +197,42 @@ function drawGrid(){
 }
 
 drawGrid();
+context = canvas.getContext("2d");
+Queue = [];
+Queue.push([Math.floor(radius*.03+radius),radius]);
+tImgData = context.getImageData(0,0,1,1);
+tImgData.data[0] = 0;
+tImgData.data[1] = 255;
+tImgData.data[2] = 255;
+tImgData.data[3] = 255;
+context.putImageData(tImgData,x,y);
+FloodFill();
+function FloodFill(){
+    pixel = Queue.shift();
+    eImgData = context.getImageData(pixel[0]-1,pixel[1],1,1);
+    if((pixel[0] > .1*radius && eImgData.data[0] == 255 && eImgData.data[1] == 255 && eImgData.data[2] == 255) || (wImgData.data[3] > 0 && wImgData.data[3] < 200)){
+        context.putImageData(tImgData,pixel[0]-1,pixel[1]);
+        Queue.push([pixel[0]-1,pixel[1]]);
+    }
+    wImgData = context.getImageData(pixel[0]+1,pixel[1],1,1);
+    if((pixel[0] < 1.9*radius && wImgData.data[0] == 255 && wImgData.data[1] == 255 && wImgData.data[2] == 255) || (wImgData.data[3] > 0 && wImgData.data[3] < 200)){
+        context.putImageData(tImgData,pixel[0]+1,pixel[1]);
+        Queue.push([pixel[0]+1,pixel[1]]);
+    }
+    nImgData = context.getImageData(pixel[0],pixel[1]-1,1,1);
+    if((pixel[1] > .1*radius && nImgData.data[0] == 255 && nImgData.data[1] == 255 && nImgData.data[2] == 255) || (wImgData.data[3] > 0 && wImgData.data[3] < 200)){
+        context.putImageData(tImgData,pixel[0],pixel[1]-1);
+        Queue.push([pixel[0],pixel[1]-1]);
+    }
+    sImgData = context.getImageData(pixel[0],pixel[1]+1,1,1);
+    if((pixel[1] < 1.9*radius && sImgData.data[0] == 255 && sImgData.data[1] == 255 && sImgData.data[2] == 255) || (sImgData.data[3] > 0 && wImgData.data[3] < 200)){
+        context.putImageData(tImgData,pixel[0],pixel[1]+1);
+        Queue.push([pixel[0],pixel[1]+1]);
+    }
+    if(Queue.length > 0){
+        setTimeout(FloodFill,1);
+    }
+}
 
 
 function mod(n, m) {
