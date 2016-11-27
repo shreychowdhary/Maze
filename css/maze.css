@@ -4,3 +4,9 @@ canvas {
     margin-right: auto;
     display: block;
 }
+p {
+    margin:0;
+    text-align: center;
+    font-family: 'Amatic SC';
+    font-size: 1.875em;
+}

@@ -1,12 +1,12 @@
 var canvas = document.getElementById("myCanvas");
 
 if(window.outerWidth > window.outerHeight){
-    canvas.width = window.outerHeight*.99;
-    canvas.height = window.outerHeight*.99;
+    canvas.width = window.outerHeight*.9;
+    canvas.height = window.outerHeight*.9;
 }
 else{
-    canvas.width = window.outerWidth*.99;
-    canvas.height = window.outerWidth*.99;
+    canvas.width = window.outerWidth*.9;
+    canvas.height = window.outerWidth*.9;
 }
 
 
