@@ -245,67 +245,36 @@ function CellFloodFill(){
     if(Queue.length>0){
         setTimeout(CellFloodFill,3);
     }
-}
-canvasRawData = context.getImageData(0,0,canvas.width,canvas.height);
-pixelGrid = [];
-pixelGrid.length = canvas.width;
-for(x = 0; x < canvas.width; x++){
-    pixelGrid[x] = [];
-    pixelGrid[x].length = canvas.height;
-    for(y = 0; y < canvas.height; y++){
-        pixelGrid[x][y] = new Pixel(x,y);
+    else{
+        Solve(circleGraph.exitCell);
     }
 }
 
-for(i = 0; i < canvasRawData.data.length; i+=4) {
-    pixelGrid[(i/4) % (canvas.width)][Math.floor(i/(canvas.height*4))].data = [canvasRawData.data[i],
-    canvasRawData.data[i+1],
-    canvasRawData.data[i+2],
-    canvasRawData.data[i+3]];
-    //console.log(i % (canvas.width*4) + " " + Math.floor(i/(canvas.height*4)));
-}
-PixelQueue = [];
-PixelQueue.push(pixelGrid[Math.floor(radius+radius*.03)][radius]);
-context.fillStyle = "hsl(" + pixelGrid[Math.floor(radius+radius*.03)][radius].dist/3%360+ ", 100%, 50%)";
-context.fillRect(Math.floor(radius+radius*.03),radius,1,1);
-//PixelFloodFill();
-function PixelFloodFill(){
-    pixel = PixelQueue.shift();
-    pixel.visited = true;
-    x = pixel.x;
-    y = pixel.y;
-    if(!pixelGrid[x-1][y].visited && isWhite(pixelGrid[x-1][y].data)){
-        pixelGrid[x-1][y].visited = true;
-        PixelQueue.push(pixelGrid[x-1][y]);
-        pixelGrid[x-1][y].dist = pixel.dist+1;
-        context.fillStyle = "hsl(" + pixelGrid[x-1][y].dist/3%360+ ", 100%, 50%)";
-        context.fillRect(x-1,y,1,1);
+function Solve(cell){
+    curDegrees = cell.degrees;
+    y = cell.y;
+    x = cell.x;
+    console.log(cell);
+    context.strokeStyle="white";
+    context.lineWidth = 2;
+    context.beginPath();
+    context.arc(radius*(y/20+.025)*Math.cos(curDegrees*(x+.5)/180*Math.PI) + radius,radius*(y/20+.025)*Math.sin(curDegrees*(x+.5)/180*Math.PI) + radius, 2, 0, 2*Math.PI);
+    context.stroke();
+    lowestDist = 1000;
+    lowIndex = 0;
+    for(i = 0; i < cell.neighbors.length; i++){
+        if(cell.neighbors[i] != null && cell.neighbors[i].dist < lowestDist){
+            lowestDist = cell.neighbors[i].dist;
+            lowIndex = i;
+        }
     }
-    if(!pixelGrid[x+1][y].visited && isWhite(pixelGrid[x+1][y].data)){
-        pixelGrid[x+1][y].visited = true;
-        PixelQueue.push(pixelGrid[x+1][y]);
-        pixelGrid[x+1][y].dist = pixel.dist+1;
-        context.fillStyle = "hsl(" + pixelGrid[x+1][y].dist/3%360+ ", 100%, 50%)";
-        context.fillRect(x+1,y,1,1);
-    }
-    if(!pixelGrid[x][y-1].visited && isWhite(pixelGrid[x][y-1].data)){
-        pixelGrid[x][y-1].visited = true;
-        PixelQueue.push(pixelGrid[x][y-1]);
-        pixelGrid[x][y-1].dist = pixel.dist+1;
-        context.fillStyle = "hsl(" + pixelGrid[x][y-1].dist/3%360+ ", 100%, 50%)";
-        context.fillRect(x,y-1,1,1);
-    }
-    if(!pixelGrid[x][y+1].visited && isWhite(pixelGrid[x][y+1].data)){
-        pixelGrid[x][y+1].visited = true;
-        PixelQueue.push(pixelGrid[x][y+1]);
-        pixelGrid[x][y+1].dist = pixel.dist+1;
-        context.fillStyle = "hsl(" + pixelGrid[x][y+1].dist/3%360+ ", 100%, 50%)";
-        context.fillRect(x,y+1,1,1);
-    }
-    if(PixelQueue.length > 0){
-        setTimeout(PixelFloodFill,1);
+    nextCell = cell.neighbors[lowIndex];
+    if(nextCell != circleGraph.startCell){
+        setTimeout(function(){Solve(nextCell);},100);
     }
 }
+
+canvasRawData = context.getImageData(0,0,canvas.width,canvas.height);
 
 function isWhite(data){
     return (data[0] === 255 && data[1] === 255 && data[2] === 255) || (data[3] > 0 && data[3] < 255);
