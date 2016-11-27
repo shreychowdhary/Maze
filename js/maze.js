@@ -146,11 +146,9 @@ function drawGrid(){
     context.stroke();
     context.fill();
     //draw start circle
-    for(i = 1; i < 4; i++){
         context.beginPath();
-        context.arc(radius,radius,radius*.05,i*Math.PI/2,(i+1)*Math.PI/2);
+        context.arc(radius,radius,radius*.05,0,.25*Math.PI,true);
         context.stroke();
-    }
 
     for(y = 1; y < circleGraph.cells.length; y++){
         for(x = 0; x < circleGraph.cells[y].length; x++){
