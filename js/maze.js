@@ -1,12 +1,12 @@
 var canvas = document.getElementById("myCanvas");
 
 if(window.outerWidth > window.outerHeight){
-    canvas.width = window.outerHeight * .9;
-    canvas.height = window.outerHeight * .9;
+    canvas.width = window.outerHeight*.99;
+    canvas.height = window.outerHeight*.99;
 }
 else{
-    canvas.width = window.outerWidth * .9;
-    canvas.height = window.outerWidth * .9;
+    canvas.width = window.outerWidth*.99;
+    canvas.height = window.outerWidth*.99;
 }
 
 
@@ -137,7 +137,7 @@ generateMaze(circleGraph.cells[1][0],circleGraph.startCell);
 //
 function drawGrid(){
     context = canvas.getContext("2d");
-    context.lineWidth = 4;
+    context.lineWidth = 3;
     context.lineCap = "round";
     context.strokeStyle="black";
     context.fillStyle="black";
@@ -147,7 +147,7 @@ function drawGrid(){
     context.fill();
     //draw start circle
         context.beginPath();
-        context.arc(radius,radius,radius*.05,0,.25*Math.PI,true);
+        context.arc(radius,radius,radius*.05,0,(circleGraph.cells[1][0].degrees/180+.05)*Math.PI,true);
         context.stroke();
 
     for(y = 1; y < circleGraph.cells.length; y++){
