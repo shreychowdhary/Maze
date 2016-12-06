@@ -6,9 +6,22 @@
     </head>
     <body>
         <p>Created by Shrey Chowdhary</p>
-		<canvas id="myCanvas" width="800" height="800">
-				Your browser does not support the HTML5 canvas tag.
-		</canvas>
-        <p> Randomly generated maze which is solved using Flood-fill. The colors on the maze represent their distance from the center. </p>
+        <div id="container" style="display:flex;align-items:center;">
+            <div id="banner">
+                <ul>
+                  <li>Randomly Generated Maze using Recursive Backtracking.</li>
+                  <li>It is then flood fill to find the distance of each cell from the center.</li>
+                  <li>Then from the exit it finds the cell with the lowest distance and repeats till it reaches the center.</li>
+                </ul>
+            </div>
+            <div id="canvas">
+        		<canvas id="myCanvas" width="800" height="800">
+        				Your browser does not support the HTML5 canvas tag.
+        		</canvas>
+            </div>
+        </div>
+        <div id="footer">
+            <p> Distance from center and corresponding color. </p>
+        </div>
 	</body>
 </html>

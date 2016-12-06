@@ -1,12 +1,12 @@
 var canvas = document.getElementById("myCanvas");
 
 if(window.outerWidth > window.outerHeight){
-    canvas.width = window.outerHeight*.9;
-    canvas.height = window.outerHeight*.9;
+    canvas.width = window.outerHeight*.95;
+    canvas.height = window.outerHeight*.95;
 }
 else{
-    canvas.width = window.outerWidth*.9;
-    canvas.height = window.outerWidth*.9;
+    canvas.width = window.outerWidth*.95;
+    canvas.height = window.outerWidth*.95;
 }
 
 
@@ -215,7 +215,9 @@ for(y = 0; y < circleGraph.cells.length; y++){
         circleGraph.cells[y][x].visited = false;
     }
 }
+
 CellFloodFill();
+
 function CellFloodFill(){
     context.lineWidth = 0;
     cell = Queue.shift();
@@ -237,6 +239,12 @@ function CellFloodFill(){
             context.arc(radius,radius,radius*(y)/20,(curDegrees*(x+1))/180*Math.PI,(curDegrees*(x))/180*Math.PI,true);
             context.stroke();
             context.fill();
+            context.fillRect(cell.dist,canvas.height*.98,1,canvas.height*.02);
+            context.fillStyle = "black";
+            context.font = canvas.height*.02 + "px Arial";
+            if(cell.dist%100 == 0){
+                context.fillText(cell.dist,cell.dist,canvas.height*.97);
+            }
         }
     }
     drawGrid();

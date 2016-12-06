@@ -1,12 +1,27 @@
-canvas {
-    padding: 0;
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
-}
 p {
     margin:0;
     text-align: center;
     font-family: 'Amatic SC';
-    font-size: 1.875em;
+    font-size: 1.8em;
+}
+
+ul li {
+    font-family: 'Amatic SC';
+    font-size: 1.5em;
+    word-break: break-word;
+}
+
+#banner {
+    width: 25%;
+    margin-left: 0;
+    padding:0;
+}
+
+#banner p {
+    font-size: 1.2em;
+}
+
+
+#footer p {
+    font-size: 1.7em;
 }
